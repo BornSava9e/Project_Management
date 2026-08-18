@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     #   - Look for an environment variable named MONGO_URI
     #   - Assign its value to mongo_url
     mongo_url: str = Field(..., alias="MONGO_URI")
+    jwt_secret: str = Field(..., alias="JWT_SECRET")
+    jwt_algorithm: str = Field(..., alias="JWT_ALGORITHM")
 
     class Config:
         # env_file=".env" tells Pydantic to load variables from a local .env file

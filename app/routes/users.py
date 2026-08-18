@@ -1,10 +1,11 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends
 from app.database.connection import db
-from app.schema.userSchema import GetUser, CreateUser
+from app.schema.userSchema import GetUser, CreateUser, LoginUser
 from typing import List
 from datetime import datetime
 from argon2 import PasswordHasher
 from fastapi.responses import JSONResponse
+from app.dependencies.dependencies import verify_token
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -63,7 +64,7 @@ def create_user(body: CreateUser):
         )
 
 @router.get("/", response_model=List[GetUser])
-def get_user():
+def get_user(auth_user=Depends(verify_token)):
     try:
         collection = db['users']
         users = collection.find()

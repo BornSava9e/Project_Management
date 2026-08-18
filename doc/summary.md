@@ -37,6 +37,8 @@
 # Pydantic schemas in FastAPI are Python classes that define and validate the structure of request and response data. They ensure type safety, automatic validation, and generate OpenAPI documentation. Typically, you use separate schemas for input and output to keep APIs secure and clean.
 
 
+Day 3 
+
 15. have built a pydantic basic schema for getting the users from database make it handle _id field and datetime by importing some modules. now only the fields mention in the schema are returned as output for the api.
 
 16. created a settings.py file for storing all the credentials and global variables.
@@ -48,3 +50,42 @@
 19. added try except hanlding in the Get user api in user.py.
 
 20. See the swagger by running the server watched it on "localhost:3000/docs" link right now there is 2 api's which is correct.
+
+
+Day 4
+
+21. added a new routed name "authentication" which will contain the login api.
+
+22. create a basic schema for the login api, post method it will contain email and password for the login in body.
+
+23. added jwt secret and algorithm in .env file and also in settings.py file for accessing it in login api.
+
+24. FastAPI depencies are used to inject depencies into our routes. it runs before the route so we can add the verify token logic their for private routes.
+# FastAPI Depends - Use Depends() to inject dependencies into your routes. This is how you plug in authentication checks.
+
+25. HTTPBearer - is used to extract the token from authorization header in fast api.
+# FastAPI’s HTTPBearer extracts the token from the Authorization header. import like this - 
+# from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials initialized like this security = HTTPBearer()
+
+
+26. client(frontend) needs to send the jwt token like this  Authorization: Bearer <your_jwt_token>
+
+
+27. PyJWT is a lightweight Python library that lets you securely create, sign, and verify JSON Web Tokens (JWTs). It handles encoding payloads into tokens and decoding them back while automatically checking signatures and expiration claims. 
+
+
+# JWT Features Overview
+
+| **Feature**          | **Purpose**                  | **Example**                                                                 |
+|-----------------------|------------------------------|-----------------------------------------------------------------------------|
+| **Encoding**          | Create JWTs from payloads    | `jwt.encode(payload, secret, algorithm="HS256")`                            |
+| **Decoding**          | Validate + read tokens       | `jwt.decode(token, secret, algorithms=["HS256"])`                           |
+| **Signature check**   | Prevent tampering            | Raises `InvalidSignatureError` if wrong key                                 |
+| **Expiration**        | Auto reject expired tokens   | Raises `ExpiredSignatureError`                                              |
+| **Algorithms**        | Symmetric & asymmetric       | Supports multiple algorithms (e.g., HS256, RS256)
+
+
+
+28. created a login api in new authentication.py file it will check the payload under schema condition and check whether the email is exist, password is correct if everything right so create a token and pass in payload for futher flow
+
+29. 
