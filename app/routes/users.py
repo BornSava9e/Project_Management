@@ -38,7 +38,7 @@ def create_user(body: CreateUser):
             "name": name,
             "email": email,
             "password_hash": password,
-            "role": "user",
+            "role": "admin",
             "created_at": datetime.now(),
             "updated_at": datetime.now(),
             "last_login_at": None
@@ -50,7 +50,7 @@ def create_user(body: CreateUser):
             content={
                 "status": "success",
                 "message": "User created successfully",
-                "data": {k: user_body[k] for k in ["name", "email", "created_at"]}
+                "data": {k: str(user_body[k]) for k in ["name", "email", "created_at"]}
             }
         )
     except Exception as e:

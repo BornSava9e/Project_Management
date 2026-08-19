@@ -1,5 +1,5 @@
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from app.database.connection import db
 from app.schema.userSchema import LoginUser
 from fastapi.responses import JSONResponse
@@ -9,7 +9,9 @@ from app.config.settings import Settings
 import datetime
 from app.dependencies.dependencies import verify_token
 from bson import ObjectId
+import secrets
 
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 router = APIRouter(prefix="/auth", tags=['login'])
 ph= PasswordHasher()
@@ -20,8 +22,8 @@ secret = Settings()
 def login(body:LoginUser):
     try:
         print(body)
-        collection =  db['users']
-        check_user = collection.find_one({"email" : body.email})
+        user_collection =  db['users']
+        check_user = user_collection.find_one({"email" : body.email})
         print(check_user)
         if not check_user:
             print("user not found")
@@ -46,14 +48,26 @@ def login(body:LoginUser):
 
         jwt_payload =  {
               "sub" : str(check_user['_id']),
-              "name" :  check_user['name'],
-              "exp": int((datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)).timestamp())
+              "role" : check_user['role'],
+              "iat": int(datetime.datetime.now(datetime.UTC).timestamp()),
+              "exp": int((datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=15)).timestamp())
         }
 
         token  = jwt.encode(jwt_payload, secret.jwt_secret, secret.jwt_algorithm )
         print(token)
+        refresh_token =  secrets.token_urlsafe(32)
+        refresh_collection =  db["refresh_tokens"]
+        refresh_payload = {
+            "user_id" : check_user['_id'],
+            "token_hash" : ph.hash(refresh_token),
+            "expires_at" : int((datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=7)).timestamp()),
+            "created_at": int(datetime.datetime.now(datetime.UTC).timestamp()),
+            "revoked" : False,
+            "revoked_at" : None
+        }
 
-        return {"status" : "ok", "token": token}
+        refresh_collection.insert_one(refresh_payload)
+        return {"status" : "ok", "access_token": token, "refresh_token" : refresh_token}
     except Exception as e:
         print(f"Internal Server Error: {e}")
         return JSONResponse(
@@ -84,3 +98,13 @@ def auth_me(auth=Depends(verify_token)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal Server Error!"
         )
+
+
+security = HTTPBearer()
+@router.get("/refresh")
+def refresh_token(req : Request):
+    try:
+        token =  req.headers.get("Authorization")
+        print(token.replace("Bearer ", ""))
+    except Exception as e:
+        print(f"Error: {e}")

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from app.database.connection import db
-from app.routes import users, authentication
+from app.routes import authentication, users
 
 app = FastAPI()
 
