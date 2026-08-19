@@ -1401,15 +1401,15 @@ status codes
 ## Day 4 — Login + JWT
 
 ```text
-[ ] Login endpoint
-[ ] Password verification
-[ ] JWT access token
-[ ] Token expiration
-[ ] Authentication dependency
-[ ] /auth/me
-[ ] Invalid token handling
-[ ] Expired token handling
-[ ] Authentication tests
+[x] Login endpoint
+[x] Password verification
+[x] JWT access token
+[x] Token expiration
+[x] Authentication dependency
+[x] /auth/me
+[x] Invalid token handling
+[x] Expired token handling
+[x] Authentication tests
 ```
 
 Learn:

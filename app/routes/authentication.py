@@ -1,5 +1,5 @@
 import jwt
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.connection import db
 from app.schema.userSchema import LoginUser
 from fastapi.responses import JSONResponse
@@ -7,12 +7,16 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from app.config.settings import Settings
 import datetime
-router = APIRouter(prefix="/auth/login", tags=['login'])
+from app.dependencies.dependencies import verify_token
+from bson import ObjectId
+
+
+router = APIRouter(prefix="/auth", tags=['login'])
 ph= PasswordHasher()
 secret = Settings()
 
 
-@router.post("/", response_model=dict)
+@router.post("/login", response_model=dict)
 def login(body:LoginUser):
     try:
         print(body)
@@ -43,7 +47,7 @@ def login(body:LoginUser):
         jwt_payload =  {
               "sub" : str(check_user['_id']),
               "name" :  check_user['name'],
-              "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+              "exp": int((datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)).timestamp())
         }
 
         token  = jwt.encode(jwt_payload, secret.jwt_secret, secret.jwt_algorithm )
@@ -58,4 +62,25 @@ def login(body:LoginUser):
                 "status" : "Error",
                 "message" : "Internal Server Error!"
             }
+        )
+
+
+@router.get("/me", response_model=dict)
+def auth_me(auth=Depends(verify_token)):
+    try:
+        user = auth  # decoded JWT payload
+        print(user)
+        collection = db['users']
+        check_user = collection.find_one({"_id": ObjectId(user["sub"])})
+        if check_user:
+            check_user['_id'] = str(check_user["_id"])
+        return {
+            "status": "success",
+            "data": check_user
+        }
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error!"
         )

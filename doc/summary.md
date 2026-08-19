@@ -88,4 +88,59 @@ Day 4
 
 28. created a login api in new authentication.py file it will check the payload under schema condition and check whether the email is exist, password is correct if everything right so create a token and pass in payload for futher flow
 
-29. 
+29. created a dependency - dependecy is like a pre function which runs before our route so we mostly use it for the token verification in our code. it just like a middleware in node.
+
+# creattion  of dependicies we use some good predefined classed and function
+- Depends - used for injecting a dependencies logic into our routes. we import this from fastapi.
+
+- HTTPBearer -  is a fastAPI helper that looks at the incoming request headers. so we use it for accessing the request headers for the jwt token. remeber this is class of fastapi. we import it from fastapi.security import HTTPBearer, HttpAuthorizationCredentials
+
+- security - is an instance of the httpbearer class. we intialized it like this security =  HTTPBearer(), 
+# HTTPBearer class and security instance only used for checking if the token is present if not so it automatically rejects the request. 
+# why do we use it because this is a standard fast api way of doing things. we can skip writing boiler plate on our own and automatic header validation. 
+
+# And YES we can skip it by importing just Request form fast api and do everything manually like this
+
+/ 
+from fastapi import Request, JSONResponse
+import jwt
+
+SECRET_KEY = "your_secret_key"
+ALGORITHM = "HS256"
+
+async def verify_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return JSONResponse(
+            status_code=403,
+            content={"status": "error", "message": "Authorization header missing or invalid"}
+        )
+    
+    token = auth_header.split(" ")[1]
+
+/
+
+
+- HTTPAuthorizationCredentials is the object return by the HTTPBearer after the security check. It contains two attributes scheme and credentials.
+scheme contain "Bearer"
+credentials contain "token itself"
+so that can be used for the jwt decode function later.
+
+
+# Putting 29 point together 
+
+When a request hits a route that depends on verify_token:
+
+FastAPI runs security → extracts the token from the header.
+
+Wraps it in an HTTPAuthorizationCredentials object.
+
+Passes that object into your verify_token function as the credentials parameter.
+
+Inside verify_token, you then call jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM]) to validate the token.
+
+
+30. created a simple authme endpoint to check if our verify token depency is working or not.
+
+* Day 5
+
