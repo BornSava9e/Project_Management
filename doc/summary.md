@@ -144,3 +144,25 @@ Inside verify_token, you then call jwt.decode(credentials.credentials, SECRET_KE
 
 * Day 5
 
+31. added refresh token to the login api. refresh token is created by the python "secret" module by importing secrets like this import secrets.
+for refresh token generation it generated a random string
+ secrets.token_urlsafe(32) with this method.
+ one more string is generated as token_id for the refresh token collection.
+refresh token = token_id + original refresh token string.
+original refresh token is hashed and stored in database.
+
+32. create a refresh token table containing the token_id and token hash, revoke, userId fields and other timestamps field.
+
+33. created a refresh token api. does not required access token a normal jwt token. it required refresh token in body. which will be check in the api by seperating token_id from the refresh token and checking the hash token with body refresh token. if it verifies correctly so return a new access token.
+refresh token have 7 days validity.
+access token have 15 minutes validity.
+
+
+34. created a logout api which will take the refresh tokena and verify it in database and comparing it against the hash password after successfulll validation. it will update the refresh token collection for the token is now revoked. can't be used again.
+
+
+
+Day 6.
+
+
+
