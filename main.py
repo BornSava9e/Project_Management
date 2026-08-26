@@ -1,20 +1,20 @@
 from fastapi import FastAPI
 import uvicorn
 from app.database.connection import db
-from app.routes import authentication, users
+from app.routes import authentication, users, project
 
 app = FastAPI()
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(authentication.router, prefix="/api/v1")
-
+app.include_router(project.router, prefix="/api/v1")
 
 @app.get("/")
 def root():
         return "Server is running at port 3000!"
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host = "127.0.0.1", port=3000, reload = True)
+    uvicorn.run("main:app", host = "127.0.0.1", port=3000, reload = True, access_log=True )
 
 
 

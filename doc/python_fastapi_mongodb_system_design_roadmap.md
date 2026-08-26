@@ -1425,14 +1425,14 @@ HTTP Bearer authentication
 ## Day 5 — Refresh Token + Logout
 
 ```text
-[ ] Refresh token generation
-[ ] Refresh token collection
-[ ] Token hashing
-[ ] Refresh endpoint
-[ ] Expiration
-[ ] Revocation
-[ ] Logout
-[ ] Tests
+[x] Refresh token generation
+[x] Refresh token collection
+[x] Token hashing
+[x] Refresh endpoint
+[x] Expiration
+[x] Revocation
+[x] Logout
+[x] Tests
 ```
 
 ## Day 6 — Projects
