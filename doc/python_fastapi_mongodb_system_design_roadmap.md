@@ -1438,8 +1438,8 @@ HTTP Bearer authentication
 ## Day 6 — Projects
 
 ```text
-[ ] Project CRUD
-[ ] Project owner
+[x] Project CRUD
+[x] Project owner
 [ ] Project members
 [ ] Permissions
 [ ] Member APIs

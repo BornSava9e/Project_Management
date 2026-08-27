@@ -1,13 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 import uvicorn
 from app.database.connection import db
-from app.routes import authentication, users, project
-
+from app.routes import authentication, users, project, members
 app = FastAPI()
 
 app.include_router(users.router, prefix="/api/v1")
 app.include_router(authentication.router, prefix="/api/v1")
 app.include_router(project.router, prefix="/api/v1")
+app.include_router(members.router, prefix="/api/v1")
 
 @app.get("/")
 def root():

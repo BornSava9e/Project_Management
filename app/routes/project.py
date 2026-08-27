@@ -7,27 +7,9 @@ import datetime
 from app.dependencies.dependencies import verify_token
 from bson import ObjectId
 from app.exceptions.serialiaze import serialize_doc
+from app.exceptions.response import success, error
 
 router = APIRouter(prefix="/project", tags=['project'])
-
-from fastapi.responses import JSONResponse
-
-def success(st_code: int, mes: str = None, data=None):
-    resp = {"status": "success"}
-    if mes: resp["message"] = mes
-    if data: resp["data"] = data
-    return JSONResponse(status_code=st_code, content=resp)
-
-
-def error(st_code : int, mes : str):
-    print(f"Error: {mes}")
-    return JSONResponse(
-        status_code=st_code,
-        content={
-            "status" : "error",
-            "message" : mes
-        }
-    )
 
 def fetch_user(q):
     try:
@@ -154,7 +136,30 @@ async def update_project_details(project_id : str, body : dict = Body(...), auth
             "updated_at": int(datetime.datetime.now().timestamp()),
         }
 
-        print(update_params)
-        return success(200,"success",update_params)
+        result = project_collection.update_one({"_id" : ObjectId(project_id)},{"$set": update_params})
+        print(result.modified_count)
+        return success(200,"success",result.modified_count)
     except Exception as e:
         return error(500, str(e))
+
+
+@router.delete("/{project_id}",response_model=dict)
+async def delete_project(project_id : str, auth=Depends(verify_token)):
+    try:
+        user_id = auth['sub']
+        pro_col =  db['projects']
+        pro_det = pro_col.find_one({"_id": ObjectId(project_id)})
+
+        if not pro_det:
+            return error(404, "Project not found!")
+        elif pro_det["owner_id"] != ObjectId(user_id):
+            return error(403, "Not Allowed to delete the project!")
+        else:
+            print('Project found!')
+
+        result = pro_col.delete_one({"_id": ObjectId(project_id)})
+        return success(200, "Deleted Successfully", result.deleted_count)
+    except Exception as e:
+        return error(500, str(e))
+
+
