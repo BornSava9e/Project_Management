@@ -1440,12 +1440,12 @@ HTTP Bearer authentication
 ```text
 [x] Project CRUD
 [x] Project owner
-[ ] Project members
-[ ] Permissions
-[ ] Member APIs
-[ ] Duplicate member protection
-[ ] Owner protection
-[ ] Tests
+[x] Project members
+[x] Permissions
+[x] Member APIs
+[x] Duplicate member protection
+[x] Owner protection
+[x] Tests
 ```
 
 ## Day 7 — Tasks
